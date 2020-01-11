@@ -1,5 +1,6 @@
 <template>
   <svg
+    @click="onClick"
     class="arrow"
     width="45"
     height="58"
@@ -32,6 +33,12 @@ export default Vue.extend({
   computed: {
     d (): string {
       return this.direction === Direction.left ? LEFT : RIGHT
+    }
+  },
+  methods: {
+    onClick () {
+      console.log(5)
+      this.$emit('click')
     }
   }
 })

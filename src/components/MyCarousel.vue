@@ -2,23 +2,30 @@
   <div class="carousel-container">
     <div class="slider">
       <div class="arrow-wrapper">
-        <DefaultArrow :direction="arrowDirectionLeft" />
+        <DefaultArrow
+          @click="onClickArrow(arrowDirectionLeft)"
+          :direction="arrowDirectionLeft"
+        />
       </div>
       <SliderImage
         v-for="(image, i) in images"
         :key="i"
         :image="image"
-        :active="0 === i"
+        :active="i === state.activeIndex"
       />
       <div class="arrow-wrapper">
-        <DefaultArrow :direction="arrowDirectionRight" />
+        <DefaultArrow
+          @click="onClickArrow(arrowDirectionRight)"
+          :direction="arrowDirectionRight"
+        />
       </div>
     </div>
     <ul class="indicator-list">
       <CarouselIndicator
         v-for="(image, i) in images"
+        @click.native="onClickIndicator(i)"
         :key="i"
-        :active="0 === i"
+        :active="i === state.activeIndex"
       />
     </ul>
   </div>
@@ -27,13 +34,46 @@
 <script lang="ts">
 import Vue from 'vue'
 import DefaultArrow, { Direction as ArrowDirection } from './DefaultArrow.vue'
+import { createComponent, computed, reactive } from '@vue/composition-api'
 import SliderImage, { SliderImageType } from './SliderImage.vue'
 import CarouselIndicator from './CarouselIndicator.vue'
 
-export default Vue.extend({
+function arrowDirectionComposition () {
+  const arrowDirectionLeft = computed((): ArrowDirection => ArrowDirection.left)
+  const arrowDirectionRight = computed((): ArrowDirection => ArrowDirection.right)
+
+  return { arrowDirectionLeft, arrowDirectionRight }
+}
+
+function activeImageComposition (images: SliderImageType[]) {
+  const state = reactive<{ activeIndex: number }>({
+    activeIndex: 0
+  })
+
+  function onClickIndicator (i: number) {
+    state.activeIndex = i
+  }
+
+  function onClickArrow (direction: ArrowDirection) {
+    const activeIndex = state.activeIndex
+    if (direction === ArrowDirection.left) {
+      state.activeIndex = activeIndex === 0 ? images.length - 1 : activeIndex - 1
+    } else {
+      state.activeIndex = activeIndex === images.length - 1 ? 0 : activeIndex + 1
+    }
+  }
+
+  return {
+    state,
+    onClickIndicator,
+    onClickArrow
+  }
+}
+
+export default createComponent({
   props: {
     images: {
-      type: Array as Vue.PropType<SliderImageType[]>,
+      type: Array,
       required: true
     }
   },
@@ -42,12 +82,10 @@ export default Vue.extend({
     SliderImage,
     CarouselIndicator
   },
-  computed: {
-    arrowDirectionLeft () {
-      return ArrowDirection.left
-    },
-    arrowDirectionRight () {
-      return ArrowDirection.right
+  setup (props: { images: SliderImageType[] }) {
+    return {
+      ...activeImageComposition(props.images),
+      ...arrowDirectionComposition()
     }
   }
 })
