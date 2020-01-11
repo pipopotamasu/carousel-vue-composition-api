@@ -1,29 +1,34 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+    <MyCarousel :images="images" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import HelloWorld from './components/HelloWorld.vue'
+import MyCarousel from './components/MyCarousel.vue'
 
 export default Vue.extend({
-  name: 'app',
   components: {
-    HelloWorld
+    MyCarousel
+  },
+  computed: {
+    images () {
+      return [
+        { src: './sample1.png', alt: '1' },
+        { src: './sample2.png', alt: '2' },
+        { src: './sample3.png', alt: '3' }
+      ]
+    }
   }
 })
 </script>
 
 <style>
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>
